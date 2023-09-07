@@ -6,7 +6,8 @@
         "dev": "next dev -p 3301",
         "build": "next build",
         "start": "next start -p 3301",
-        "lint": "next lint"
+        "lint": "next lint",
+        "pm2": "pm2 start \"npm run start\" --name rtls-client"
     },
     "dependencies": {
         "@carbon/icons-react": "^11.26.0",
