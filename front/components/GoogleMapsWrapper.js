@@ -7,7 +7,7 @@ import io from 'socket.io-client'
 
 const containerStyle = {
     width: '100vw',
-    height: '100vh',
+    height: '95vh',
 }
 
 const initialCenter = {
@@ -102,7 +102,7 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
             <GoogleMap
                 mapContainerStyle={containerStyle}
                 center={mapCenter}
-                zoom={20}
+                zoom={13}
                 options={{
                     streetViewControl: false,
                     scaleControl: false,
@@ -128,7 +128,7 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
                                 }}
                                 icon={{
                                     path: google.maps.SymbolPath.CIRCLE,
-                                    scale: 15, // 마커의 크기
+                                    scale: 20, // 마커의 크기
                                     fillColor: data.isMe
                                         ? '#f23920'
                                         : '#53389E', // 자신은 빨간색, 다른 사용자는 파란색

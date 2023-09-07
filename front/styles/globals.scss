@@ -6,15 +6,21 @@
 // Import Font
 @import url(https://cdn.jsdelivr.net/npm/@xz/fonts@1/serve/ibm-plex-sans.min.css);
 @import url(https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@1.0/nanumsquare.css);
+@import url('https://fonts.cdnfonts.com/css/inter');
 
 * {
     box-sizing: border-box;
+    --cds-button-primary: #121212;
+    --cds-button-primary-hover: #121212;
+    --cds-button-primary-active: #121212;
+    --cds-button-focus-color: none;
 }
 html,
 body {
     padding: 0;
     margin: 0;
-    font-family: 'IBM Plex Sans', '나눔스퀘어', 'NanumSquare', sans-serif;
+    font-family: 'Inter', 'IBM Plex Sans', '나눔스퀘어', 'NanumSquare',
+        sans-serif;
 }
 .reg {
     font-weight: 400;
@@ -47,6 +53,52 @@ a {
 }
 
 // Carbon Design System Update
-#toggle-1-location-share.bx--toggle--checked .bx--toggle__switch {
-    background-color: #f23920;
+
+//MAP Gradation
+.gradient-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.gradient-container:before,
+.gradient-container:after {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 70px;
+    z-index: 2;
+}
+
+.gradient-container:before {
+    top: 0;
+    // background: linear-gradient(
+    //     to bottom,
+    //     rgba(0, 0, 0, 0.9) 70%,
+    //     rgba(0, 0, 0, 0)
+    // );
+    background-color: rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(1px);
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px;
+}
+
+// .gradient-container:after {
+//     bottom: 0;
+//     background: linear-gradient(
+//         to top,
+//         rgba(0, 0, 0, 1),
+//         rgba(255, 255, 255, 0.5)
+//     );
+// }
+
+// - Button
+
+// - Toggle
+.cds--toggle__switch--checked {
+    // background: linear-gradient(27deg, #53389e 8.33%, #ff3542 91.67%);
+    background: #f23920;
+}
+.cds--toggle__button:focus + .cds--toggle__label .cds--toggle__switch,
+.cds--toggle:not(.cds--toggle--disabled):active .cds--toggle__switch {
+    box-shadow: none;
 }

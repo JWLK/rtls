@@ -3,6 +3,7 @@ import { Button, Toggle } from '@carbon/react'
 import {
     Location,
     WatsonHealthImageAvailabilityLocal,
+    LocationPersonFilled,
 } from '@carbon/icons-react'
 import { GoogleMapsWrapper, socket } from '../components/GoogleMapsWrapper'
 
@@ -30,25 +31,53 @@ export default function Home() {
                     style={{
                         position: 'absolute',
                         top: 30,
-                        right: 20,
+                        left: 10,
+                        zIndex: 10,
+                        padding: '10px',
+                    }}
+                >
+                    <div
+                        style={{
+                            color: '#F23920',
+                            fontFamily: 'Inter',
+                            fontSize: '12px',
+                            fontStyle: 'normal',
+                            fontWeight: 400,
+                            lineHeight: 'normal',
+                            textDecoration: 'underline',
+                            textUnderlineOffset: '5px',
+                        }}
+                    >
+                        ROAD AROUND CLUB
+                    </div>
+                </div>
+
+                <div
+                    style={{
+                        display: 'flex',
+                        position: 'absolute',
+                        top: 25,
+                        right: 10,
                         zIndex: 10,
                         padding: '10px',
                     }}
                 >
                     <Toggle
                         id="toggle-1-location-share"
-                        labelText="SHARE LOCATION"
+                        labelText="" //SHARE LOCATION
                         onToggle={handleToggle}
                         toggled={isSharingEnabled}
-                        style={{ marginBottom: '10px' }}
+                        size={'md'}
+                        hideLabel
                     />
                 </div>
 
                 <div
                     style={{
+                        display: 'flex',
                         position: 'absolute',
-                        bottom: '50vh',
-                        right: 10,
+                        top: '50vh',
+                        right: 3,
                         zIndex: 10,
                         padding: '10px',
                     }}
@@ -57,19 +86,22 @@ export default function Home() {
                         onClick={toggleCentering}
                         kind={isCentered ? 'primary' : 'secondary'}
                         renderIcon={
-                            isCentered
-                                ? WatsonHealthImageAvailabilityLocal
-                                : Location
+                            isCentered ? LocationPersonFilled : Location
                         }
                         hasIconOnly={true}
                         iconDescription={isCentered ? 'Center' : 'Free'}
                         disabled={!isSharingEnabled}
+                        style={{
+                            boxShadow: 'rgba(0, 0, 0, 0.3) 0px 1px 4px -1px;',
+                        }}
                     />
                 </div>
-                <GoogleMapsWrapper
-                    isSharingEnabled={isSharingEnabled}
-                    isCentered={isCentered}
-                />
+                <div className="gradient-container">
+                    <GoogleMapsWrapper
+                        isSharingEnabled={isSharingEnabled}
+                        isCentered={isCentered}
+                    />
+                </div>
             </div>
         </>
     )
