@@ -24,40 +24,53 @@ export default function Home() {
     }, [isCentered])
 
     return (
-        <div>
-            <div
-                style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    zIndex: 10,
-                    padding: '10px',
-                }}
-            >
-                <Toggle
-                    id="toggle-1"
-                    labelText="Enable Location Sharing"
-                    onToggle={handleToggle}
-                    toggled={isSharingEnabled}
-                    style={{ marginBottom: '10px' }}
-                />
-                <Button
-                    onClick={toggleCentering}
-                    kind={isCentered ? 'primary' : 'secondary'}
-                    renderIcon={
-                        isCentered
-                            ? WatsonHealthImageAvailabilityLocal
-                            : Location
-                    }
-                    hasIconOnly={true}
-                    iconDescription={isCentered ? 'Center' : 'Free'}
-                    disabled={!isSharingEnabled}
+        <>
+            <div>
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: 30,
+                        right: 20,
+                        zIndex: 10,
+                        padding: '10px',
+                    }}
+                >
+                    <Toggle
+                        id="toggle-1-location-share"
+                        labelText="SHARE LOCATION"
+                        onToggle={handleToggle}
+                        toggled={isSharingEnabled}
+                        style={{ marginBottom: '10px' }}
+                    />
+                </div>
+
+                <div
+                    style={{
+                        position: 'absolute',
+                        bottom: '50vh',
+                        right: 10,
+                        zIndex: 10,
+                        padding: '10px',
+                    }}
+                >
+                    <Button
+                        onClick={toggleCentering}
+                        kind={isCentered ? 'primary' : 'secondary'}
+                        renderIcon={
+                            isCentered
+                                ? WatsonHealthImageAvailabilityLocal
+                                : Location
+                        }
+                        hasIconOnly={true}
+                        iconDescription={isCentered ? 'Center' : 'Free'}
+                        disabled={!isSharingEnabled}
+                    />
+                </div>
+                <GoogleMapsWrapper
+                    isSharingEnabled={isSharingEnabled}
+                    isCentered={isCentered}
                 />
             </div>
-            <GoogleMapsWrapper
-                isSharingEnabled={isSharingEnabled}
-                isCentered={isCentered}
-            />
-        </div>
+        </>
     )
 }

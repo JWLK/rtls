@@ -85,7 +85,7 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
                 })
             }
         }
-        const intervalId = setInterval(updateLocation, 1000)
+        const intervalId = setInterval(updateLocation, 300)
 
         return () => {
             socket.off('update location', handleLocationUpdate)
@@ -129,7 +129,9 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
                                 icon={{
                                     path: google.maps.SymbolPath.CIRCLE,
                                     scale: 15, // 마커의 크기
-                                    fillColor: data.isMe ? 'red' : 'blue', // 자신은 빨간색, 다른 사용자는 파란색
+                                    fillColor: data.isMe
+                                        ? '#f23920'
+                                        : '#53389E', // 자신은 빨간색, 다른 사용자는 파란색
                                     fillOpacity: 0.7,
                                     strokeColor: 'white',
                                     strokeOpacity: 1,
