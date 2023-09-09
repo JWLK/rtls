@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const path = require('path')
 const withPWA = require('next-pwa')
+const withPlugins = require('next-compose-plugins')
 
 const nextConfig = {
     reactStrictMode: true,
@@ -16,12 +17,14 @@ const nextConfig = {
     sassOptions: {
         includePaths: [path.join(__dirname, 'styles')],
     },
+}
 
-    // PWA configuration
+const pwaConfig = {
     pwa: {
         dest: 'public',
+        register: true,
+        skipWaiting: true,
         disable: process.env.NODE_ENV === 'development',
     },
 }
-
-module.exports = withPWA(nextConfig)
+module.exports = withPlugins([[withPWA, pwaConfig]], nextConfig)
