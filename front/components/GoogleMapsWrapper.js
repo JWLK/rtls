@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react'
 
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api'
+import { MapTheme_DarkGreen } from '../themes/google-map/map-dark-green'
+import { MapTheme_DarkGray } from '../themes/google-map/map-dark-gray'
 // import { InfoWindow } from '@react-google-maps/api'; // 현재 InfoWindow는 주석 처리 되어 있음
 
 import io from 'socket.io-client'
@@ -17,6 +19,8 @@ const initialCenter = {
     //37.57972779165909, 126.97704086507996
 }
 
+const customStyles = MapTheme_DarkGray
+
 export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
     const [permissionStatus, setPermissionStatus] = useState(null) // 위치 권한 상태 저장
     const [socket, setSocket] = useState(null)
@@ -25,6 +29,20 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
     const [mapCenter, setMapCenter] = useState(initialCenter)
     const hasCenterBeenSetRef = useRef(false)
     const ownHashCode = useRef(null)
+
+    //Location View
+    const [prevPosition, setPrevPosition] = useState(null)
+    function calculateBearing(startLat, startLng, destLat, destLng) {
+        const y = Math.sin(destLng - startLng) * Math.cos(destLat)
+        const x =
+            Math.cos(startLat) * Math.sin(destLat) -
+            Math.sin(startLat) *
+                Math.cos(destLat) *
+                Math.cos(destLng - startLng)
+        let brng = Math.atan2(y, x) * (180 / Math.PI)
+        brng = (brng + 360) % 360
+        return brng
+    }
 
     const SOCKET_SERVER_URL =
         process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || 'http://localhost:3000'
@@ -111,6 +129,8 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
     useEffect(() => {
         if (!socket || !isSharingEnabled) return
 
+        let watchId
+
         const handleLocationUpdate = (dataList) => {
             // console.log('dataList', dataList)
             const updatedDataList = dataList.map((data) => {
@@ -137,27 +157,46 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
 
         socket.on('update-location', handleLocationUpdate)
 
-        const updateLocation = () => {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const { latitude, longitude } = position.coords
-                        const location = {
-                            lat: latitude,
-                            lng: longitude,
-                        }
-                        socket.emit('share-location', location)
-                    },
-                    (error) => {
-                        if (error.code === error.PERMISSION_DENIED) {
-                            //alert('share-location error')
-                        }
-                    },
-                )
-            }
+        if (navigator.geolocation) {
+            watchId = navigator.geolocation.watchPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords
+                    const location = { lat: latitude, lng: longitude }
+
+                    socket.emit('share-location', location)
+                    if (prevPosition) {
+                        const bearing = calculateBearing(
+                            prevPosition.lat,
+                            prevPosition.lng,
+                            location.lat,
+                            location.lng,
+                        )
+                        // 위에서 계산된 bearing 값을 어떻게 사용할지 정의해야 합니다.
+                    }
+
+                    setPrevPosition(location)
+                },
+                (error) => {
+                    if (error.code === error.PERMISSION_DENIED) {
+                        // 위치 권한이 거부되었을 때의 처리
+                    }
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 5000,
+                    maximumAge: 0,
+                },
+            )
         }
 
-        const intervalId = setInterval(updateLocation, 300)
+        return () => {
+            if (socket) {
+                socket.off('update-location', handleLocationUpdate)
+            }
+            if (watchId !== undefined) {
+                navigator.geolocation.clearWatch(watchId)
+            }
+        }
 
         return () => {
             if (socket) {
@@ -183,6 +222,9 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
                     rotateControl: false,
                     fullscreenControl: false,
                     zoomControl: true,
+                    disableDefaultUI: true,
+                    clickableIcons: false,
+                    styles: customStyles, // 여기에 스타일을 추가
                 }}
             >
                 {markerData &&
@@ -195,17 +237,27 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
                                 key={data.hash}
                                 position={{ lat: data.lat, lng: data.lng }}
                                 label={{
-                                    text: data.isMe ? 'You' : 'other',
+                                    text: data.isMe ? '-' : 'X',
                                     color: 'white',
                                     fontSize: '10px',
                                 }}
                                 icon={{
-                                    path: google.maps.SymbolPath.CIRCLE,
-                                    scale: 20, // 마커의 크기
+                                    path: google.maps.SymbolPath
+                                        .FORWARD_OPEN_ARROW,
+                                    rotation: prevPosition
+                                        ? calculateBearing(
+                                              prevPosition.lat,
+                                              prevPosition.lng,
+                                              data.lat,
+                                              data.lng,
+                                          )
+                                        : 0,
+
+                                    scale: 5, // 마커의 크기
                                     fillColor: data.isMe
                                         ? '#f23920'
                                         : '#53389E', // 자신은 빨간색, 다른 사용자는 파란색
-                                    fillOpacity: 0.7,
+                                    fillOpacity: 0.5,
                                     strokeColor: 'white',
                                     strokeOpacity: 1,
                                     strokeWeight: 1,
