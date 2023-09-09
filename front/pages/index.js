@@ -30,8 +30,8 @@ export default function Home() {
                 <div
                     style={{
                         position: 'absolute',
-                        top: 30,
-                        left: 10,
+                        top: 20,
+                        left: 3,
                         zIndex: 10,
                         padding: '10px',
                     }}
@@ -46,6 +46,8 @@ export default function Home() {
                             lineHeight: 'normal',
                             textDecoration: 'underline',
                             textUnderlineOffset: '5px',
+                            backdropFilter: 'blur(1px)',
+                            padding: '10px 5px',
                         }}
                     >
                         ROAD AROUND CLUB
@@ -82,6 +84,7 @@ export default function Home() {
                         right: 3,
                         zIndex: 10,
                         padding: '10px',
+                        opacity: '0.7',
                     }}
                 >
                     <Button

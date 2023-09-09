@@ -1,6 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react'
 
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api'
+import {
+    GoogleMap,
+    LoadScript,
+    Marker,
+    OverlayView,
+} from '@react-google-maps/api'
 import { MapTheme_DarkGreen } from '../themes/google-map/map-dark-green'
 import { MapTheme_DarkGray } from '../themes/google-map/map-dark-gray'
 // import { InfoWindow } from '@react-google-maps/api'; // 현재 InfoWindow는 주석 처리 되어 있음
@@ -9,7 +14,7 @@ import io from 'socket.io-client'
 
 const containerStyle = {
     width: '100vw',
-    height: '85vh',
+    height: '90vh',
 }
 
 const initialCenter = {
@@ -32,16 +37,36 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
 
     //Location View
     const [prevPosition, setPrevPosition] = useState(null)
-    function calculateBearing(startLat, startLng, destLat, destLng) {
-        const y = Math.sin(destLng - startLng) * Math.cos(destLat)
-        const x =
-            Math.cos(startLat) * Math.sin(destLat) -
-            Math.sin(startLat) *
-                Math.cos(destLat) *
-                Math.cos(destLng - startLng)
-        let brng = Math.atan2(y, x) * (180 / Math.PI)
-        brng = (brng + 360) % 360
-        return brng
+    const [currentSpeed, setCurrentSpeed] = useState(0) // 현재 속도 저장
+
+    const calculateBearing = (lat1, long1, lat2, long2) => {
+        var y = Math.sin(long2 - long1) * Math.cos(lat2)
+        var x =
+            Math.cos(lat1) * Math.sin(lat2) -
+            Math.sin(lat1) * Math.cos(lat2) * Math.cos(long2 - long1)
+        var bearing = (Math.atan2(y, x) * 180) / Math.PI
+        return bearing
+    }
+    const calculateDistance = (lat1, lon1, lat2, lon2) => {
+        const R = 6371e3
+        const phi1 = (lat1 * Math.PI) / 180
+        const phi2 = (lat2 * Math.PI) / 180
+        const deltaPhi = ((lat2 - lat1) * Math.PI) / 180
+        const deltaLambda = ((lon2 - lon1) * Math.PI) / 180
+
+        const a =
+            Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+            Math.cos(phi1) *
+                Math.cos(phi2) *
+                Math.sin(deltaLambda / 2) *
+                Math.sin(deltaLambda / 2)
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+
+        return R * c
+    }
+    // 속도 표시를 위한 OverlayView의 포지션 계산 함수
+    const getPixelPositionOffset = (width, height) => {
+        return { x: -(width / 2), y: -(height - 30) } // 40은 마커의 높이와 글자 사이의 간격을 의미합니다. 원하는 값을 조절해주세요.
     }
 
     const SOCKET_SERVER_URL =
@@ -174,6 +199,23 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
                         // 위에서 계산된 bearing 값을 어떻게 사용할지 정의해야 합니다.
                     }
 
+                    // 속도 계산
+                    if (prevPosition) {
+                        const deltaTime =
+                            (position.timestamp -
+                                (prevPosition.timestamp || 0)) /
+                            1000
+                        const distance = calculateDistance(
+                            prevPosition.lat,
+                            prevPosition.lng,
+                            location.lat,
+                            location.lng,
+                        )
+                        const speed = distance / deltaTime // m/s
+
+                        setCurrentSpeed(speed * 3.6) // km/h로 변환
+                    }
+
                     setPrevPosition(location)
                 },
                 (error) => {
@@ -233,38 +275,73 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
                         // const isMe = data.hash === myHash
 
                         return (
-                            <Marker
-                                key={data.hash}
-                                position={{ lat: data.lat, lng: data.lng }}
-                                label={{
-                                    text: data.isMe ? '-' : 'X',
-                                    color: 'white',
-                                    fontSize: '10px',
-                                }}
-                                icon={{
-                                    path: google.maps.SymbolPath
-                                        .FORWARD_OPEN_ARROW,
-                                    rotation: prevPosition
-                                        ? calculateBearing(
-                                              prevPosition.lat,
-                                              prevPosition.lng,
-                                              data.lat,
-                                              data.lng,
-                                          )
-                                        : 0,
+                            <>
+                                <Marker
+                                    key={data.hash}
+                                    position={{ lat: data.lat, lng: data.lng }}
+                                    label={{
+                                        text: data.isMe ? '-' : 'X',
+                                        color: 'white',
+                                        fontSize: '10px',
+                                    }}
+                                    icon={{
+                                        path: google.maps.SymbolPath
+                                            .FORWARD_OPEN_ARROW,
+                                        rotation: prevPosition
+                                            ? calculateBearing(
+                                                  prevPosition.lat,
+                                                  prevPosition.lng,
+                                                  data.lat,
+                                                  data.lng,
+                                              )
+                                            : 0,
 
-                                    scale: 5, // 마커의 크기
-                                    fillColor: data.isMe
-                                        ? '#f23920'
-                                        : '#53389E', // 자신은 빨간색, 다른 사용자는 파란색
-                                    fillOpacity: 0.5,
-                                    strokeColor: 'white',
-                                    strokeOpacity: 1,
-                                    strokeWeight: 1,
-                                    // url: 'path_to_your_image.png',
-                                    // scaledSize: new google.maps.Size(40, 40), // 아이콘 이미지 크기를 40x40 픽셀로
-                                }}
-                            />
+                                        scale: 5, // 마커의 크기
+                                        fillColor: data.isMe
+                                            ? '#f23920'
+                                            : '#53389E', // 자신은 빨간색, 다른 사용자는 파란색
+                                        fillOpacity: 0.5,
+                                        strokeColor: 'white',
+                                        strokeOpacity: 1,
+                                        strokeWeight: 1,
+                                        // url: 'path_to_your_image.png',
+                                        // scaledSize: new google.maps.Size(40, 40), // 아이콘 이미지 크기를 40x40 픽셀로
+                                    }}
+                                />
+                                {data.isMe && (
+                                    <OverlayView
+                                        position={{
+                                            lat: data.lat,
+                                            lng: data.lng,
+                                        }}
+                                        mapPaneName={
+                                            OverlayView.OVERLAY_MOUSE_TARGET
+                                        }
+                                        getPixelPositionOffset={
+                                            getPixelPositionOffset
+                                        }
+                                    >
+                                        <div
+                                            style={{
+                                                width: '80px', // div의 너비를 100px로 설정
+                                                height: '20px', // div의 높이를 50px로 설정
+                                                marginLeft: '-40px',
+                                                backgroundColor:
+                                                    'rgba(255, 255, 255, 0.7)',
+                                                padding: '5px', // 내부 텍스트와 div 경계 사이의 간격 설정
+                                                borderRadius: '10px', // 둥근 모서리를 위해 설정
+                                                fontSize: '10px', // 폰트 크기 설정
+                                                textAlign: 'center',
+                                                border: '0px solid black', // 테두리 설정
+                                            }}
+                                        >
+                                            {`속도: ${currentSpeed.toFixed(
+                                                2,
+                                            )} km/h`}
+                                        </div>
+                                    </OverlayView>
+                                )}
+                            </>
                         )
                     })}
             </GoogleMap>
