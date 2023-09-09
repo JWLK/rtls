@@ -30,7 +30,7 @@ export default function Home() {
                 <div
                     style={{
                         position: 'absolute',
-                        top: 20,
+                        top: 'calc(constant(safe-area-inset-bottom) + 20px)',
                         left: 3,
                         zIndex: 10,
                         padding: '10px',

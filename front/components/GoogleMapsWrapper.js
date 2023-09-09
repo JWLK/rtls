@@ -14,7 +14,7 @@ import io from 'socket.io-client'
 
 const containerStyle = {
     width: '100vw',
-    height: '93vh',
+    height: '100vh',
 }
 
 const initialCenter = {
