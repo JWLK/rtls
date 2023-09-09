@@ -46,8 +46,8 @@ export default function Home() {
                             lineHeight: 'normal',
                             textDecoration: 'underline',
                             textUnderlineOffset: '5px',
-                            backdropFilter: 'blur(1px)',
-                            padding: '10px 5px',
+                            backdropFilter: 'blur(2px)',
+                            padding: '15px 10px',
                         }}
                     >
                         ROAD AROUND CLUB

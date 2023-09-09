@@ -14,7 +14,7 @@ import io from 'socket.io-client'
 
 const containerStyle = {
     width: '100vw',
-    height: '90vh',
+    height: '93vh',
 }
 
 const initialCenter = {
@@ -39,14 +39,6 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
     const [prevPosition, setPrevPosition] = useState(null)
     const [currentSpeed, setCurrentSpeed] = useState(0) // 현재 속도 저장
 
-    const calculateBearing = (lat1, long1, lat2, long2) => {
-        var y = Math.sin(long2 - long1) * Math.cos(lat2)
-        var x =
-            Math.cos(lat1) * Math.sin(lat2) -
-            Math.sin(lat1) * Math.cos(lat2) * Math.cos(long2 - long1)
-        var bearing = (Math.atan2(y, x) * 180) / Math.PI
-        return bearing
-    }
     const calculateDistance = (lat1, lon1, lat2, lon2) => {
         const R = 6371e3
         const phi1 = (lat1 * Math.PI) / 180
@@ -189,15 +181,6 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
                     const location = { lat: latitude, lng: longitude }
 
                     socket.emit('share-location', location)
-                    if (prevPosition) {
-                        const bearing = calculateBearing(
-                            prevPosition.lat,
-                            prevPosition.lng,
-                            location.lat,
-                            location.lng,
-                        )
-                        // 위에서 계산된 bearing 값을 어떻게 사용할지 정의해야 합니다.
-                    }
 
                     // 속도 계산
                     if (prevPosition) {
@@ -256,7 +239,7 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
             <GoogleMap
                 mapContainerStyle={containerStyle}
                 center={mapCenter}
-                zoom={13}
+                zoom={15}
                 options={{
                     streetViewControl: false,
                     scaleControl: false,
@@ -280,23 +263,13 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
                                     key={data.hash}
                                     position={{ lat: data.lat, lng: data.lng }}
                                     label={{
-                                        text: data.isMe ? '-' : 'X',
+                                        text: data.isMe ? 'ME' : 'X',
                                         color: 'white',
                                         fontSize: '10px',
                                     }}
                                     icon={{
-                                        path: google.maps.SymbolPath
-                                            .FORWARD_OPEN_ARROW,
-                                        rotation: prevPosition
-                                            ? calculateBearing(
-                                                  prevPosition.lat,
-                                                  prevPosition.lng,
-                                                  data.lat,
-                                                  data.lng,
-                                              )
-                                            : 0,
-
-                                        scale: 5, // 마커의 크기
+                                        path: google.maps.SymbolPath.CIRCLE,
+                                        scale: 20, // 마커의 크기
                                         fillColor: data.isMe
                                             ? '#f23920'
                                             : '#53389E', // 자신은 빨간색, 다른 사용자는 파란색
