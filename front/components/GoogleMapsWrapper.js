@@ -18,6 +18,9 @@ const initialCenter = {
 }
 
 export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
+    const [permissionStatus, setPermissionStatus] = useState(null) // 위치 권한 상태 저장
+    const [socket, setSocket] = useState(null)
+
     const [markerData, setMarkerData] = useState([])
     const [mapCenter, setMapCenter] = useState(initialCenter)
     const hasCenterBeenSetRef = useRef(false)
@@ -27,25 +30,86 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
         process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || 'http://localhost:3000'
 
     useEffect(() => {
-        if (!isSharingEnabled) {
-            hasCenterBeenSetRef.current = false
-            return // 위치 공유가 비활성화면 아무 것도 하지 않음
+        // 위치 권한 체크
+        if ('permissions' in navigator) {
+            navigator.permissions
+                .query({ name: 'geolocation' })
+                .then((result) => {
+                    if (result.state === 'denied') {
+                        alert('앱을 사용하려면 위치 권한이 필요합니다.')
+                    } else if (result.state === 'prompt') {
+                        // 위치 권한을 요청
+                        requestLocationPermission()
+                    }
+
+                    // 권한 상태가 변경될 때마다 체크
+                    result.onchange = function () {
+                        if (this.state === 'denied') {
+                            alert('앱을 사용하려면 위치 권한이 필요합니다.')
+                        }
+                    }
+                })
         }
 
-        const socket = io(SOCKET_SERVER_URL)
+        // 위치 권한 요청 함수
+        function requestLocationPermission() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        // 권한이 승인됐을 때의 로직
+                    },
+                    (error) => {
+                        if (error.code === error.PERMISSION_DENIED) {
+                            alert('위치 권한이 거부되었습니다.')
+                        }
+                    },
+                )
+            }
+        }
+    }, [])
 
-        socket.on('connect', () => {
+    useEffect(() => {
+        // 위치 권한 거부 처리
+        if (permissionStatus === 'denied') {
+            alert(
+                '위치 서비스에 권한을 거부하였습니다. 설정에서 권한을 활성화 해주세요.',
+            )
+            return
+        }
+
+        if (!isSharingEnabled) {
+            if (socket) {
+                socket.disconnect()
+            }
+            return
+        }
+
+        const socketInstance = io(SOCKET_SERVER_URL)
+
+        socketInstance.on('connect', () => {
             console.log('Connected to the server')
         })
 
-        socket.on('connect_error', (error) => {
+        socketInstance.on('connect_error', (error) => {
             console.error('Connection error:', error)
         })
 
-        socket.on('client-hash', (hash) => {
+        socketInstance.on('client-hash', (hash) => {
             console.log('hash', hash)
             ownHashCode.current = hash
         })
+
+        setSocket(socketInstance)
+
+        return () => {
+            if (socketInstance) {
+                socketInstance.disconnect()
+            }
+        }
+    }, [permissionStatus, isSharingEnabled, SOCKET_SERVER_URL])
+
+    useEffect(() => {
+        if (!socket || !isSharingEnabled) return
 
         const handleLocationUpdate = (dataList) => {
             // console.log('dataList', dataList)
@@ -70,29 +134,38 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
                 }
             }
         }
+
         socket.on('update-location', handleLocationUpdate)
 
         const updateLocation = () => {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition((position) => {
-                    const { latitude, longitude } = position.coords
-                    const location = {
-                        lat: latitude,
-                        lng: longitude,
-                    }
-                    // console.log('newData :: ' + JSON.stringify(location))
-                    socket.emit('share-location', location)
-                })
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const { latitude, longitude } = position.coords
+                        const location = {
+                            lat: latitude,
+                            lng: longitude,
+                        }
+                        socket.emit('share-location', location)
+                    },
+                    (error) => {
+                        if (error.code === error.PERMISSION_DENIED) {
+                            //alert('share-location error')
+                        }
+                    },
+                )
             }
         }
+
         const intervalId = setInterval(updateLocation, 300)
 
         return () => {
-            socket.off('update location', handleLocationUpdate)
-            socket.disconnect()
+            if (socket) {
+                socket.off('update-location', handleLocationUpdate)
+            }
             clearInterval(intervalId)
         }
-    }, [isCentered, isSharingEnabled, SOCKET_SERVER_URL])
+    }, [socket, isSharingEnabled, isCentered])
 
     return (
         <LoadScript

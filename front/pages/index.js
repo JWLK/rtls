@@ -8,7 +8,7 @@ import {
 import { GoogleMapsWrapper, socket } from '../components/GoogleMapsWrapper'
 
 export default function Home() {
-    const [isSharingEnabled, setSharingEnabled] = useState(false)
+    const [isSharingEnabled, setSharingEnabled] = useState(true)
     const [isCentered, setIsCentered] = useState(false)
 
     const handleToggle = useCallback((toggled) => {
@@ -52,6 +52,7 @@ export default function Home() {
                     </div>
                 </div>
 
+                {/* DEV MANUAL LOACTION MODE */}
                 <div
                     style={{
                         display: 'flex',
@@ -60,6 +61,7 @@ export default function Home() {
                         right: 10,
                         zIndex: 10,
                         padding: '10px',
+                        visibility: 'hidden',
                     }}
                 >
                     <Toggle

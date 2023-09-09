@@ -29,10 +29,11 @@ app.get('/', (req, res) => {
 })
 
 io.on('connection', (socket) => {
+    const connectionTime = getKoreaTimeISO()
     const hash = crypto.randomBytes(8).toString('hex')
-    socket.emit('client-hash', hash) // 연결된 클라이언트에게 자신의 hash 값을 전송
+    console.log(`User [${hash}] connected at ${connectionTime}`)
 
-    console.log('a user connected :: ' + hash)
+    socket.emit('client-hash', hash) // 연결된 클라이언트에게 자신의 hash 값을 전송
 
     let clientIp =
         socket.request.headers['x-forwarded-for'] ||
@@ -53,7 +54,8 @@ io.on('connection', (socket) => {
     })
 
     socket.on('disconnect', () => {
-        console.log('user disconnected')
+        const disconnectTime = getKoreaTimeISO()
+        console.log(`User [${hash}] disconnected at ${disconnectTime}`)
         usersLocation.delete(hash)
     })
 })
@@ -61,3 +63,22 @@ io.on('connection', (socket) => {
 server.listen(PORT, () => {
     console.log(`listening on *:${PORT}`)
 })
+
+function getKoreaTimeISO() {
+    const date = new Date()
+    return (
+        new Intl.DateTimeFormat('en-GB', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false,
+            timeZone: 'Asia/Seoul',
+        })
+            .format(date)
+            .replace(/\/|, /g, '-')
+            .replace(' ', 'T') + ':00'
+    )
+}
