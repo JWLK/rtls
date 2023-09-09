@@ -1,10 +1,9 @@
-/** @type {import('next').NextConfig} */
-const path = require('path') // 1. path 선언
+const path = require('path')
+const withPWA = require('next-pwa')
 
 const nextConfig = {
     reactStrictMode: true,
 
-    reactStrictMode: true,
     webpack(config) {
         config.module.rules.push({
             test: /\.svg$/,
@@ -16,6 +15,12 @@ const nextConfig = {
     sassOptions: {
         includePaths: [path.join(__dirname, 'styles')],
     },
+
+    // PWA configuration
+    pwa: {
+        dest: 'public',
+        disable: process.env.NODE_ENV === 'development',
+    },
 }
 
-module.exports = nextConfig
+module.exports = withPWA(nextConfig)

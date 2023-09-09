@@ -5,12 +5,12 @@ export default function Document() {
         <Html lang="kr">
             <Head>
                 {/* <meta name="viewport" content="viewport-fit=cover" /> */}
+                <link rel="manifest" href="/manifest.json" />
                 <meta
                     name="apple-mobile-web-app-status-bar-style"
                     content="black-translucent"
                 />
                 <meta name="theme-color" content="#373737" />
-                {/* 원하는 색상으로 변경 */}
             </Head>
             <body>
                 <Main />
