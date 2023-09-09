@@ -306,9 +306,7 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
                                                 border: '0px solid black', // 테두리 설정
                                             }}
                                         >
-                                            {`속도: ${currentSpeed.toFixed(
-                                                2,
-                                            )} km/h`}
+                                            {`${currentSpeed.toFixed(2)} km/h`}
                                         </div>
                                     </OverlayView>
                                 )}
