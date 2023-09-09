@@ -188,18 +188,23 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
                             (position.timestamp -
                                 (prevPosition.timestamp || 0)) /
                             1000
-                        const distance = calculateDistance(
-                            prevPosition.lat,
-                            prevPosition.lng,
-                            location.lat,
-                            location.lng,
-                        )
-                        const speed = distance / deltaTime // m/s
-
-                        setCurrentSpeed(speed * 3.6) // km/h로 변환
+                        if (deltaTime > 0) {
+                            // deltaTime이 0보다 큰 경우에만 속도 계산
+                            const distance = calculateDistance(
+                                prevPosition.lat,
+                                prevPosition.lng,
+                                location.lat,
+                                location.lng,
+                            )
+                            const speed = distance / deltaTime
+                            setCurrentSpeed(speed * 3.6) // m/s to km/h
+                        }
                     }
 
-                    setPrevPosition(location)
+                    setPrevPosition({
+                        ...location,
+                        timestamp: position.timestamp,
+                    })
                 },
                 (error) => {
                     if (error.code === error.PERMISSION_DENIED) {
@@ -221,13 +226,6 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
             if (watchId !== undefined) {
                 navigator.geolocation.clearWatch(watchId)
             }
-        }
-
-        return () => {
-            if (socket) {
-                socket.off('update-location', handleLocationUpdate)
-            }
-            clearInterval(intervalId)
         }
     }, [socket, isSharingEnabled, isCentered])
 
