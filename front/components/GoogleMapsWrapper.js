@@ -251,7 +251,7 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
                     mapTypeControl: false,
                     rotateControl: false,
                     fullscreenControl: false,
-                    zoomControl: true,
+                    zoomControl: false,
                     disableDefaultUI: true,
                     clickableIcons: false,
                     styles: customStyles, // 여기에 스타일을 추가

@@ -26,7 +26,11 @@ export default function Home() {
 
     return (
         <>
-            <div>
+            <div
+                style={{
+                    paddingBottom: 'calc(env(safe-area-inset-bottom) + 10px)',
+                }}
+            >
                 <div
                     style={{
                         position: 'absolute',

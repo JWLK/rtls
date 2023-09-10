@@ -76,24 +76,19 @@ a {
 
 .gradient-container:before {
     top: 0;
-    // background: linear-gradient(
-    //     to bottom,
-    //     rgba(0, 0, 0, 0.9) 70%,
-    //     rgba(0, 0, 0, 0)
-    // );
-    // background-color: rgba(0, 0, 0, 0.1);
-    // backdrop-filter: blur(1px);
-    // box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px;
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.5),
+        rgba(0, 0, 0, 0)
+    );
+    backdrop-filter: blur(1px);
 }
 
-// .gradient-container:after {
-//     bottom: 0;
-//     background: linear-gradient(
-//         to top,
-//         rgba(0, 0, 0, 1),
-//         rgba(255, 255, 255, 0.5)
-//     );
-// }
+.gradient-container:after {
+    bottom: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
+    backdrop-filter: blur(1px);
+}
 
 // - Button
 
