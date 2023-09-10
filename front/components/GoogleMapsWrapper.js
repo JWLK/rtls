@@ -10,6 +10,8 @@ import { MapTheme_DarkGreen } from '../themes/google-map/map-dark-green'
 import { MapTheme_DarkGray } from '../themes/google-map/map-dark-gray'
 // import { InfoWindow } from '@react-google-maps/api'; // 현재 InfoWindow는 주석 처리 되어 있음
 
+import KalmanFilter from 'kalmanjs'
+
 import io from 'socket.io-client'
 
 const containerStyle = {
@@ -25,6 +27,10 @@ const initialCenter = {
 }
 
 const customStyles = MapTheme_DarkGray
+
+//Karman
+const kalmanFilterLat = new KalmanFilter()
+const kalmanFilterLng = new KalmanFilter()
 
 export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
     const [permissionStatus, setPermissionStatus] = useState(null) // 위치 권한 상태 저장
@@ -178,7 +184,10 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
             watchId = navigator.geolocation.watchPosition(
                 (position) => {
                     const { latitude, longitude } = position.coords
-                    const location = { lat: latitude, lng: longitude }
+                    const filteredLat = kalmanFilterLat.filter(latitude)
+                    const filteredLng = kalmanFilterLng.filter(longitude)
+
+                    const location = { lat: filteredLat, lng: filteredLng }
 
                     socket.emit('share-location', location)
 
@@ -213,7 +222,7 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
                 },
                 {
                     enableHighAccuracy: true,
-                    timeout: 5000,
+                    timeout: 1000,
                     maximumAge: 0,
                 },
             )
