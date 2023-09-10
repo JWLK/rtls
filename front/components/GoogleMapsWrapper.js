@@ -64,14 +64,6 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
 
         return R * c
     }
-    // 마커 표시를 위한 OverlayView의 포지션 계산 함수
-    const getPixelPositionOffset_Maker = (width, height) => {
-        return { x: -(width / 2) - 12, y: -(width / 2) - 12 }
-    }
-    // 속도 표시를 위한 OverlayView의 포지션 계산 함수
-    const getPixelPositionOffset_Speed = (width, height) => {
-        return { x: -(width / 2), y: -(height - 20) } // 40은 마커의 높이와 글자 사이의 간격을 의미합니다. 원하는 값을 조절해주세요.
-    }
 
     const SOCKET_SERVER_URL =
         process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || 'http://localhost:3000'
@@ -193,7 +185,7 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
                     const filteredLat = kalmanFilterLat.filter(latitude)
                     const filteredLng = kalmanFilterLng.filter(longitude)
 
-                    const location = { lat: filteredLat, lng: filteredLng }
+                    const location = { lat: latitude, lng: longitude }
 
                     socket.emit('share-location', location)
 
@@ -228,7 +220,7 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
                 },
                 {
                     enableHighAccuracy: true,
-                    timeout: 1000,
+                    timeout: 5000,
                     maximumAge: 0,
                 },
             )
@@ -271,26 +263,46 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
                         // const isMe = data.hash === myHash
 
                         return (
-                            <>
+                            <React.Fragment key={`markerData-${index}`}>
+                                <Marker
+                                    key={data.hash}
+                                    position={{ lat: data.lat, lng: data.lng }}
+                                    label={{
+                                        text: data.isMe ? 'You' : 'other',
+                                        color: 'white',
+                                        fontSize: '10px',
+                                    }}
+                                    icon={{
+                                        path: google.maps.SymbolPath.CIRCLE,
+                                        scale: 15, // 마커의 크기
+                                        fillColor: data.isMe
+                                            ? '#fff'
+                                            : '#53389E', // 자신은 빨간색, 다른 사용자는 파란색
+                                        fillOpacity: 1,
+                                        strokeColor: 'white',
+                                        strokeOpacity: 0,
+                                        strokeWeight: 0,
+                                        // url: 'path_to_your_image.png',
+                                        // scaledSize: new google.maps.Size(40, 40), // 아이콘 이미지 크기를 40x40 픽셀로
+                                    }}
+                                />
                                 <OverlayView
                                     position={{ lat: data.lat, lng: data.lng }}
                                     mapPaneName={
                                         OverlayView.OVERLAY_MOUSE_TARGET
                                     }
-                                    getPixelPositionOffset={
-                                        getPixelPositionOffset_Maker
-                                    }
                                 >
-                                    <>
-                                        <div
-                                            className={
-                                                data.isMe
-                                                    ? 'pulsingOverlayRed'
-                                                    : 'pulsingOverlayBlue'
-                                            }
-                                        ></div>
-                                        <div className="centerDot"></div>
-                                    </>
+                                    <div
+                                        className={
+                                            data.isMe
+                                                ? 'pulsingOverlayRed'
+                                                : 'pulsingOverlayBlue'
+                                        }
+                                    >
+                                        <>
+                                            {/* <div className="centerDot"></div> */}
+                                        </>
+                                    </div>
                                 </OverlayView>
 
                                 {data.isMe && (
@@ -302,31 +314,13 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
                                         mapPaneName={
                                             OverlayView.OVERLAY_MOUSE_TARGET
                                         }
-                                        getPixelPositionOffset={
-                                            getPixelPositionOffset_Speed
-                                        }
                                     >
-                                        <div
-                                            style={{
-                                                width: '80px', // div의 너비를 100px로 설정
-                                                height: '20px', // div의 높이를 50px로 설정
-                                                marginLeft: '-40px',
-                                                backgroundColor:
-                                                    'rgba(255, 255, 255, 0.1)',
-                                                padding: '5px', // 내부 텍스트와 div 경계 사이의 간격 설정
-                                                borderRadius: '5px', // 둥근 모서리를 위해 설정
-                                                fontSize: '10px', // 폰트 크기 설정
-                                                lineHeight: '1',
-                                                textAlign: 'center',
-                                                color: '#fff',
-                                                border: '0px solid black', // 테두리 설정
-                                            }}
-                                        >
+                                        <div className="speedInfo">
                                             {`${currentSpeed.toFixed(2)} km/h`}
                                         </div>
                                     </OverlayView>
                                 )}
-                            </>
+                            </React.Fragment>
                         )
                     })}
             </GoogleMap>

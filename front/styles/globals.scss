@@ -115,7 +115,7 @@ a {
         opacity: 1;
     }
     50% {
-        transform: scale(1.1);
+        transform: scale(1.2);
         opacity: 1;
     }
 }
@@ -123,10 +123,12 @@ a {
 .pulsingOverlayRed,
 .pulsingOverlayBlue {
     position: relative;
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
+    margin-top: -10.5px;
+    margin-left: -10px;
     border-radius: 50%;
-    animation: pulse 2s infinite cubic-bezier(0.42, 0, 0.58, 1);
+    animation: pulse 3s infinite cubic-bezier(0.42, 0, 0.58, 1);
 }
 
 .pulsingOverlayRed {
@@ -149,4 +151,21 @@ a {
     border-radius: 50%;
     animation: none;
     opacity: 1;
+}
+
+// Sppeed Info
+
+.speedInfo {
+    width: 80px;
+    height: 20px;
+    margin-top: 20px;
+    margin-left: -40px;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 10px;
+    line-height: 1;
+    text-align: center;
+    color: #fff;
+    border: 0px solid black;
 }
