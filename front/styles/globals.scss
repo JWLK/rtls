@@ -106,3 +106,47 @@ a {
 .cds--toggle:not(.cds--toggle--disabled):active .cds--toggle__switch {
     box-shadow: none;
 }
+
+// - Map Animation
+@keyframes pulse {
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+}
+
+.pulsingOverlayRed,
+.pulsingOverlayBlue {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    animation: pulse 2s infinite cubic-bezier(0.42, 0, 0.58, 1);
+}
+
+.pulsingOverlayRed {
+    background-color: #f23920;
+}
+
+.pulsingOverlayBlue {
+    background-color: #53389e;
+}
+
+.centerDot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    width: 15px;
+    height: 15px;
+    margin: 12px;
+    background-color: white;
+    border-radius: 50%;
+    animation: none;
+    opacity: 1;
+}
