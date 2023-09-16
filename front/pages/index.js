@@ -12,7 +12,7 @@ import { Dashboard } from '@mui/icons-material'
 import { Camera } from 'react-feather'
 
 import { IoIosChatbubbles } from 'react-icons/io'
-import { TbLocation, TbLocationFilled, TbLocationPin } from 'react-icons/Tb'
+import { TbLocation, TbLocationFilled, TbLocationPin } from 'react-icons/tb'
 
 // import { GoogleMapsWrapper, socket } from '../components/GoogleMapsWrapper'
 const GoogleMapsWrapper = dynamic(
