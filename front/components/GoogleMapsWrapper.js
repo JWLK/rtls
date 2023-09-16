@@ -187,38 +187,49 @@ export default function GoogleMapsWrapper({
                     const location = { lat: latitude, lng: longitude }
 
                     socket.emit('share-location', location)
-
+                    console.log(position)
                     // 속도 계산
-                    if (prevPosition) {
-                        const deltaTime =
-                            (position.timestamp -
-                                (prevPosition.timestamp || 0)) /
-                            1000
-                        // console.log('deltaTime :: ' + deltaTime)
-                        const distance = calculateDistance(
-                            prevPosition.lat,
-                            prevPosition.lng,
-                            location.lat,
-                            location.lng,
-                        )
-
-                        if (
-                            // deltaTime > MIN_DELTA_TIME &&
-                            distance > MIN_MOVEMENT_DISTANCE
-                        ) {
-                            // deltaTime과 이동 거리가 모두 임계값보다 큰 경우에만 속도 계산
-                            const speed = distance / deltaTime
-                            setCurrentSpeed(speed * 3.6) // m/s to km/h
-                        } else {
-                            // 작은 deltaTime 또는 작은 이동 거리의 경우 속도를 0 또는 이전 속도로 설정
-                            setCurrentSpeed(0) // 또는 이전 속도로 설정
-                        }
+                    if (position.coords.speed !== null) {
+                        // 이동 속도를 계산하고 표시
+                        const speedInMetersPerSecond = position.coords.speed // 초당 미터 (m/s)
+                        const speedInKilometersPerHour = (
+                            speedInMetersPerSecond * 3.6
+                        ).toFixed(2) // m/s를 km/h로 변환
+                        setCurrentSpeed(speedInKilometersPerHour)
+                    } else {
+                        // 이동 속도가 제공되지 않으면 속도를 0으로 설정
+                        setCurrentSpeed(0)
                     }
+                    // if (prevPosition) {
+                    //     const deltaTime =
+                    //         (position.timestamp -
+                    //             (prevPosition.timestamp || 0)) /
+                    //         1000
+                    //     //
+                    //     const distance = calculateDistance(
+                    //         prevPosition.lat,
+                    //         prevPosition.lng,
+                    //         location.lat,
+                    //         location.lng,
+                    //     )
 
-                    setPrevPosition({
-                        ...location,
-                        timestamp: position.timestamp,
-                    })
+                    //     if (
+                    //         // deltaTime > MIN_DELTA_TIME &&
+                    //         distance > MIN_MOVEMENT_DISTANCE
+                    //     ) {
+                    //         // deltaTime과 이동 거리가 모두 임계값보다 큰 경우에만 속도 계산
+                    //         const speed = distance / deltaTime
+                    //         setCurrentSpeed(speed * 3.6) // m/s to km/h
+                    //     } else {
+                    //         // 작은 deltaTime 또는 작은 이동 거리의 경우 속도를 0 또는 이전 속도로 설정
+                    //         setCurrentSpeed(0) // 또는 이전 속도로 설정
+                    //     }
+                    // }
+
+                    // setPrevPosition({
+                    //     ...location,
+                    //     timestamp: position.timestamp,
+                    // })
                 },
                 (error) => {
                     if (error.code === error.PERMISSION_DENIED) {
@@ -273,14 +284,17 @@ export default function GoogleMapsWrapper({
                             <React.Fragment key={`markerData-${index}`}>
                                 <Marker
                                     key={data.hash}
-                                    position={{ lat: data.lat, lng: data.lng }}
+                                    position={{
+                                        lat: data.lat,
+                                        lng: data.lng,
+                                    }}
                                     label={{
                                         text: data.isMe ? 'Me' : 'other',
                                         color: 'white',
                                         fontSize: '10px',
                                     }}
                                     icon={{
-                                        path: google.maps.SymbolPath.CIRCLE,
+                                        path: google?.maps.SymbolPath.CIRCLE,
                                         scale: 15, // 마커의 크기
                                         fillColor: data.isMe
                                             ? '#fff'
