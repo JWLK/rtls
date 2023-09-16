@@ -18,7 +18,7 @@ const containerStyle = {
 }
 
 const MIN_DELTA_TIME = 1 // 임계값 설정 (초 단위)
-const MIN_MOVEMENT_DISTANCE = 0.1 // 최소 이동 거리 (미터 단위)
+const MIN_MOVEMENT_DISTANCE = 1 // 최소 이동 거리 (미터 단위)
 
 const initialCenter = {
     lat: 37.57972779165909,
