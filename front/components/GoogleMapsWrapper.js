@@ -184,7 +184,7 @@ export default function GoogleMapsWrapper({
         if (navigator.geolocation) {
             watchId = navigator.geolocation.watchPosition(
                 (position) => {
-                    const { latitude, longitude } = position.coords
+                    const { latitude, longitude, speed } = position.coords
 
                     const location = { lat: latitude, lng: longitude }
 
@@ -209,7 +209,7 @@ export default function GoogleMapsWrapper({
                             distance > MIN_MOVEMENT_DISTANCE
                         ) {
                             // deltaTime과 이동 거리가 모두 임계값보다 큰 경우에만 속도 계산
-                            const speed = distance / deltaTime
+                            // const speed = distance / deltaTime
                             setCurrentSpeed(speed * 3.6) // m/s to km/h
                         } else {
                             // 작은 deltaTime 또는 작은 이동 거리의 경우 속도를 0 또는 이전 속도로 설정
