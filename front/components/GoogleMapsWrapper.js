@@ -194,7 +194,7 @@ export default function GoogleMapsWrapper({
                             (position.timestamp -
                                 (prevPosition.timestamp || 0)) /
                             1000
-                        console.log('deltaTime :: ' + deltaTime)
+                        // console.log('deltaTime :: ' + deltaTime)
                         const distance = calculateDistance(
                             prevPosition.lat,
                             prevPosition.lng,
