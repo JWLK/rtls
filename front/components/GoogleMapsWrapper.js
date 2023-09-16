@@ -269,14 +269,7 @@ export default function GoogleMapsWrapper({
                         // const isMe = data.hash === myHash
 
                         return (
-                            <React.Fragment
-                                key={`markerData-${index}`}
-                                styles={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }}
-                            >
+                            <React.Fragment key={`markerData-${index}`}>
                                 <Marker
                                     key={data.hash}
                                     position={{ lat: data.lat, lng: data.lng }}

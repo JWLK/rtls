@@ -1,13 +1,19 @@
 import { useState, useCallback } from 'react'
-import { Button, Toggle } from '@carbon/react'
 import dynamic from 'next/dynamic'
+import { Button, Toggle } from '@carbon/react'
 import {
+    Workspace,
     Location,
+    LocationCurrent,
     WatsonHealthImageAvailabilityLocal,
     LocationPersonFilled,
 } from '@carbon/icons-react'
-// import { GoogleMapsWrapper, socket } from '../components/GoogleMapsWrapper'
+import { Dashboard } from '@mui/icons-material'
+import { Camera } from 'react-feather'
 
+import { IoIosChatbubbles } from 'react-icons/io'
+
+// import { GoogleMapsWrapper, socket } from '../components/GoogleMapsWrapper'
 const GoogleMapsWrapper = dynamic(
     () => import('../components/GoogleMapsWrapper'),
     {
@@ -92,7 +98,7 @@ export default function Home() {
                     style={{
                         display: 'flex',
                         position: 'absolute',
-                        top: '50vh',
+                        bottom: 'calc(500vh - env(safe-area-inset-bottom))',
                         right: 3,
                         zIndex: 10,
                         padding: '10px',
@@ -118,6 +124,18 @@ export default function Home() {
                         isSharingEnabled={isSharingEnabled}
                         isCentered={isCentered}
                     />
+                </div>
+
+                <div className="navInfo">
+                    <div className="icon">
+                        <Dashboard sx={{ fontSize: 30 }} />
+                    </div>
+                    <div className="icon">
+                        <IoIosChatbubbles size="30" />
+                    </div>
+                    <div className="icon">
+                        <LocationCurrent size="30" />
+                    </div>
                 </div>
             </div>
         </>
