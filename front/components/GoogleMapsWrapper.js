@@ -194,6 +194,7 @@ export default function GoogleMapsWrapper({
                             (position.timestamp -
                                 (prevPosition.timestamp || 0)) /
                             1000
+                        console.log('deltaTime :: ' + deltaTime)
                         const distance = calculateDistance(
                             prevPosition.lat,
                             prevPosition.lng,
@@ -202,7 +203,7 @@ export default function GoogleMapsWrapper({
                         )
 
                         if (
-                            deltaTime > MIN_DELTA_TIME &&
+                            // deltaTime > MIN_DELTA_TIME &&
                             distance > MIN_MOVEMENT_DISTANCE
                         ) {
                             // deltaTime과 이동 거리가 모두 임계값보다 큰 경우에만 속도 계산
