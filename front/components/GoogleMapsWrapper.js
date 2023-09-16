@@ -285,7 +285,7 @@ export default function GoogleMapsWrapper({
                                         fontSize: '10px',
                                     }}
                                     icon={{
-                                        path: google?.maps.SymbolPath.CIRCLE,
+                                        path: google.maps.SymbolPath.CIRCLE,
                                         scale: 15, // 마커의 크기
                                         fillColor: data.isMe
                                             ? '#fff'
