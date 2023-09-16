@@ -30,7 +30,11 @@ const initialZoom = 15
 
 const customStyles = MapTheme_DarkGray
 
-export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
+export default function GoogleMapsWrapper({
+    children,
+    isSharingEnabled,
+    isCentered,
+}) {
     const [permissionStatus, setPermissionStatus] = useState(null) // 위치 권한 상태 저장
     const [socket, setSocket] = useState(null)
 

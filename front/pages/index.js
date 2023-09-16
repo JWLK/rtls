@@ -1,11 +1,19 @@
 import { useState, useCallback } from 'react'
 import { Button, Toggle } from '@carbon/react'
+import dynamic from 'next/dynamic'
 import {
     Location,
     WatsonHealthImageAvailabilityLocal,
     LocationPersonFilled,
 } from '@carbon/icons-react'
-import { GoogleMapsWrapper, socket } from '../components/GoogleMapsWrapper'
+// import { GoogleMapsWrapper, socket } from '../components/GoogleMapsWrapper'
+
+const GoogleMapsWrapper = dynamic(
+    () => import('../components/GoogleMapsWrapper'),
+    {
+        ssr: false,
+    },
+)
 
 export default function Home() {
     const [isSharingEnabled, setSharingEnabled] = useState(true)
