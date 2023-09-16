@@ -182,20 +182,15 @@ export default function GoogleMapsWrapper({
         if (navigator.geolocation) {
             watchId = navigator.geolocation.watchPosition(
                 (position) => {
-                    const { latitude, longitude } = position.coords
+                    const { latitude, longitude, speed } = position.coords
 
                     const location = { lat: latitude, lng: longitude }
 
                     socket.emit('share-location', location)
-                    console.log(position)
+                    // console.log(position)
                     // 속도 계산
-                    if (position.coords.speed !== null) {
-                        // 이동 속도를 계산하고 표시
-                        const speedInMetersPerSecond = position.coords.speed // 초당 미터 (m/s)
-                        const speedInKilometersPerHour = (
-                            speedInMetersPerSecond * 3.6
-                        ).toFixed(2) // m/s를 km/h로 변환
-                        setCurrentSpeed(speedInKilometersPerHour)
+                    if (speed !== null) {
+                        setCurrentSpeed(speed.toFixed(2))
                     } else {
                         // 이동 속도가 제공되지 않으면 속도를 0으로 설정
                         setCurrentSpeed(0)
