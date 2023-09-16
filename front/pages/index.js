@@ -12,6 +12,7 @@ import { Dashboard } from '@mui/icons-material'
 import { Camera } from 'react-feather'
 
 import { IoIosChatbubbles } from 'react-icons/io'
+import { TbLocation, TbLocationFilled, TbLocationPin } from 'react-icons/Tb'
 
 // import { GoogleMapsWrapper, socket } from '../components/GoogleMapsWrapper'
 const GoogleMapsWrapper = dynamic(
@@ -94,7 +95,7 @@ export default function Home() {
                     />
                 </div>
 
-                <div
+                {/* <div
                     style={{
                         display: 'flex',
                         position: 'absolute',
@@ -118,7 +119,7 @@ export default function Home() {
                             boxShadow: 'rgba(0, 0, 0, 0.3) 0px 1px 4px -1px;',
                         }}
                     />
-                </div>
+                </div> */}
                 <div className="gradient-container">
                     <GoogleMapsWrapper
                         isSharingEnabled={isSharingEnabled}
@@ -133,8 +134,12 @@ export default function Home() {
                     <div className="icon">
                         <IoIosChatbubbles size="30" />
                     </div>
-                    <div className="icon">
-                        <LocationCurrent size="30" />
+                    <div className="icon" onClick={toggleCentering}>
+                        {isCentered ? (
+                            <TbLocationPin size="30" color="#f23920" />
+                        ) : (
+                            <TbLocation size="30" />
+                        )}
                     </div>
                 </div>
             </div>

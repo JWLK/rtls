@@ -29,6 +29,7 @@ const initialCenter = {
     //37.57972779165909, 126.97704086507996
 }
 const initialZoom = 15
+const focusZoom = 18
 
 const customStyles = MapTheme_DarkGray
 
@@ -36,6 +37,8 @@ export default function GoogleMapsWrapper({
     children,
     isSharingEnabled,
     isCentered,
+    isZoomReset,
+    setIsZoomReset,
 }) {
     const [permissionStatus, setPermissionStatus] = useState(null) // 위치 권한 상태 저장
     const [socket, setSocket] = useState(null)
@@ -45,28 +48,10 @@ export default function GoogleMapsWrapper({
     const [mapZoom, setMapZoom] = useState(initialZoom)
     const hasCenterBeenSetRef = useRef(false)
     const ownHashCode = useRef(null)
+    const mapRef = useRef(null) // Google 지도 인스턴스에 대한 참조
 
     //Location View
-    const [prevPosition, setPrevPosition] = useState(null)
     const [currentSpeed, setCurrentSpeed] = useState(0) // 현재 속도 저장
-
-    const calculateDistance = (lat1, lon1, lat2, lon2) => {
-        const R = 6371e3
-        const phi1 = (lat1 * Math.PI) / 180
-        const phi2 = (lat2 * Math.PI) / 180
-        const deltaPhi = ((lat2 - lat1) * Math.PI) / 180
-        const deltaLambda = ((lon2 - lon1) * Math.PI) / 180
-
-        const a =
-            Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
-            Math.cos(phi1) *
-                Math.cos(phi2) *
-                Math.sin(deltaLambda / 2) *
-                Math.sin(deltaLambda / 2)
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-
-        return R * c
-    }
 
     const SOCKET_SERVER_URL =
         process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || 'http://localhost:3000'
@@ -190,38 +175,6 @@ export default function GoogleMapsWrapper({
 
                     socket.emit('share-location', location)
                     setCurrentSpeed(speed * 3.6) // m/s to km/h
-                    // console.log(position)
-                    // 속도 계산
-                    // if (prevPosition) {
-                    //     const deltaTime =
-                    //         (position.timestamp -
-                    //             (prevPosition.timestamp || 0)) /
-                    //         1000
-                    //     //
-                    //     const distance = calculateDistance(
-                    //         prevPosition.lat,
-                    //         prevPosition.lng,
-                    //         location.lat,
-                    //         location.lng,
-                    //     )
-
-                    //     if (
-                    //         // deltaTime > MIN_DELTA_TIME &&
-                    //         distance > MIN_MOVEMENT_DISTANCE
-                    //     ) {
-                    //         // deltaTime과 이동 거리가 모두 임계값보다 큰 경우에만 속도 계산
-                    //         const speed = distance / deltaTime
-                    //         setCurrentSpeed(speed * 3.6) // m/s to km/h
-                    //     } else {
-                    //         // 작은 deltaTime 또는 작은 이동 거리의 경우 속도를 0 또는 이전 속도로 설정
-                    //         setCurrentSpeed(0) // 또는 이전 속도로 설정
-                    //     }
-                    // }
-
-                    // setPrevPosition({
-                    //     ...location,
-                    //     timestamp: position.timestamp,
-                    // })
                 },
                 (error) => {
                     if (error.code === error.PERMISSION_DENIED) {
@@ -246,15 +199,27 @@ export default function GoogleMapsWrapper({
         }
     }, [socket, isSharingEnabled, isCentered])
 
+    useEffect(() => {
+        if (isCentered) {
+            setMapZoom(focusZoom)
+        }
+    }, [isCentered])
+
     return (
-        <LoadScript
-            googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
-        >
+        <>
             {children}
             <GoogleMap
+                onLoad={(map) => {
+                    mapRef.current = map
+                }}
                 mapContainerStyle={containerStyle}
                 center={mapCenter}
                 zoom={mapZoom}
+                onZoomChanged={() => {
+                    // Google 지도의 줌 레벨이 변경될 때 mapZoom 상태를 업데이트합니다.
+                    const newZoom = mapRef.current?.getZoom() // Google 지도의 현재 줌 레벨을 가져옵니다.
+                    setMapZoom(newZoom) // mapZoom 상태를 업데이트합니다.
+                }}
                 options={{
                     streetViewControl: false,
                     scaleControl: false,
@@ -356,6 +321,6 @@ export default function GoogleMapsWrapper({
                         )
                     })}
             </GoogleMap>
-        </LoadScript>
+        </>
     )
 }
