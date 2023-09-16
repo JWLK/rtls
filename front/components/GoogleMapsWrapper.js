@@ -14,7 +14,7 @@ import io from 'socket.io-client'
 
 const containerStyle = {
     width: '100vw',
-    height: 'calc(100vh + env(safe-area-inset-bottom))',
+    height: 'calc(100vh - env(safe-area-inset-bottom))',
 }
 
 const MIN_DELTA_TIME = 1 // 임계값 설정 (초 단위)
