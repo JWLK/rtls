@@ -10,14 +10,15 @@ import { MapTheme_DarkGreen } from '../themes/google-map/map-dark-green'
 import { MapTheme_DarkGray } from '../themes/google-map/map-dark-gray'
 // import { InfoWindow } from '@react-google-maps/api'; // 현재 InfoWindow는 주석 처리 되어 있음
 
-import KalmanFilter from 'kalmanjs'
-
 import io from 'socket.io-client'
 
 const containerStyle = {
     width: '100vw',
-    height: '100vh',
+    height: 'calc(100vh + env(safe-area-inset-bottom))',
 }
+
+const MIN_DELTA_TIME = 1 // 임계값 설정 (초 단위)
+const MIN_MOVEMENT_DISTANCE = 0.1 // 최소 이동 거리 (미터 단위)
 
 const initialCenter = {
     lat: 37.57972779165909,
@@ -28,10 +29,6 @@ const initialCenter = {
 const initialZoom = 15
 
 const customStyles = MapTheme_DarkGray
-
-//Karman
-const kalmanFilterLat = new KalmanFilter()
-const kalmanFilterLng = new KalmanFilter()
 
 export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
     const [permissionStatus, setPermissionStatus] = useState(null) // 위치 권한 상태 저장
@@ -182,8 +179,6 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
             watchId = navigator.geolocation.watchPosition(
                 (position) => {
                     const { latitude, longitude } = position.coords
-                    const filteredLat = kalmanFilterLat.filter(latitude)
-                    const filteredLng = kalmanFilterLng.filter(longitude)
 
                     const location = { lat: latitude, lng: longitude }
 
@@ -195,16 +190,23 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
                             (position.timestamp -
                                 (prevPosition.timestamp || 0)) /
                             1000
-                        if (deltaTime > 0) {
-                            // deltaTime이 0보다 큰 경우에만 속도 계산
-                            const distance = calculateDistance(
-                                prevPosition.lat,
-                                prevPosition.lng,
-                                location.lat,
-                                location.lng,
-                            )
+                        const distance = calculateDistance(
+                            prevPosition.lat,
+                            prevPosition.lng,
+                            location.lat,
+                            location.lng,
+                        )
+
+                        if (
+                            deltaTime > MIN_DELTA_TIME &&
+                            distance > MIN_MOVEMENT_DISTANCE
+                        ) {
+                            // deltaTime과 이동 거리가 모두 임계값보다 큰 경우에만 속도 계산
                             const speed = distance / deltaTime
                             setCurrentSpeed(speed * 3.6) // m/s to km/h
+                        } else {
+                            // 작은 deltaTime 또는 작은 이동 거리의 경우 속도를 0 또는 이전 속도로 설정
+                            setCurrentSpeed(0) // 또는 이전 속도로 설정
                         }
                     }
 
@@ -292,8 +294,31 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
                                         // url: 'path_to_your_image.png',
                                         // scaledSize: new google.maps.Size(40, 40), // 아이콘 이미지 크기를 40x40 픽셀로
                                     }}
-                                />
-                                <OverlayView
+                                    // animation={google.maps.Animation.BOUNCE}
+                                >
+                                    <OverlayView
+                                        position={{
+                                            lat: data.lat,
+                                            lng: data.lng,
+                                        }}
+                                        mapPaneName={
+                                            OverlayView.OVERLAY_MOUSE_TARGET
+                                        }
+                                    >
+                                        <div
+                                            className={
+                                                data.isMe
+                                                    ? 'pulsingOverlayRed'
+                                                    : 'pulsingOverlayBlue'
+                                            }
+                                        >
+                                            <>
+                                                {/* <div className="centerDot"></div> */}
+                                            </>
+                                        </div>
+                                    </OverlayView>
+                                </Marker>
+                                {/* <OverlayView
                                     position={{ lat: data.lat, lng: data.lng }}
                                     mapPaneName={
                                         OverlayView.OVERLAY_MOUSE_TARGET
@@ -305,12 +330,8 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
                                                 ? 'pulsingOverlayRed'
                                                 : 'pulsingOverlayBlue'
                                         }
-                                    >
-                                        <>
-                                            {/* <div className="centerDot"></div> */}
-                                        </>
-                                    </div>
-                                </OverlayView>
+                                    ></div>
+                                </OverlayView> */}
 
                                 {data.isMe && (
                                     <OverlayView
