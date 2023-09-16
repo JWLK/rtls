@@ -263,12 +263,19 @@ export function GoogleMapsWrapper({ children, isSharingEnabled, isCentered }) {
                         // const isMe = data.hash === myHash
 
                         return (
-                            <React.Fragment key={`markerData-${index}`}>
+                            <React.Fragment
+                                key={`markerData-${index}`}
+                                styles={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }}
+                            >
                                 <Marker
                                     key={data.hash}
                                     position={{ lat: data.lat, lng: data.lng }}
                                     label={{
-                                        text: data.isMe ? 'You' : 'other',
+                                        text: data.isMe ? 'Me' : 'other',
                                         color: 'white',
                                         fontSize: '10px',
                                     }}
