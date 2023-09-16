@@ -6,6 +6,8 @@ import {
     Marker,
     OverlayView,
 } from '@react-google-maps/api'
+// const google = window.google
+
 import { MapTheme_DarkGreen } from '../themes/google-map/map-dark-green'
 import { MapTheme_DarkGray } from '../themes/google-map/map-dark-gray'
 // import { InfoWindow } from '@react-google-maps/api'; // 현재 InfoWindow는 주석 처리 되어 있음
@@ -182,49 +184,43 @@ export default function GoogleMapsWrapper({
         if (navigator.geolocation) {
             watchId = navigator.geolocation.watchPosition(
                 (position) => {
-                    const { latitude, longitude, speed } = position.coords
+                    const { latitude, longitude } = position.coords
 
                     const location = { lat: latitude, lng: longitude }
 
                     socket.emit('share-location', location)
                     // console.log(position)
                     // 속도 계산
-                    if (speed !== null) {
-                        setCurrentSpeed(speed.toFixed(2))
-                    } else {
-                        // 이동 속도가 제공되지 않으면 속도를 0으로 설정
-                        setCurrentSpeed(0)
+                    if (prevPosition) {
+                        const deltaTime =
+                            (position.timestamp -
+                                (prevPosition.timestamp || 0)) /
+                            1000
+                        //
+                        const distance = calculateDistance(
+                            prevPosition.lat,
+                            prevPosition.lng,
+                            location.lat,
+                            location.lng,
+                        )
+
+                        if (
+                            // deltaTime > MIN_DELTA_TIME &&
+                            distance > MIN_MOVEMENT_DISTANCE
+                        ) {
+                            // deltaTime과 이동 거리가 모두 임계값보다 큰 경우에만 속도 계산
+                            const speed = distance / deltaTime
+                            setCurrentSpeed(speed * 3.6) // m/s to km/h
+                        } else {
+                            // 작은 deltaTime 또는 작은 이동 거리의 경우 속도를 0 또는 이전 속도로 설정
+                            setCurrentSpeed(0) // 또는 이전 속도로 설정
+                        }
                     }
-                    // if (prevPosition) {
-                    //     const deltaTime =
-                    //         (position.timestamp -
-                    //             (prevPosition.timestamp || 0)) /
-                    //         1000
-                    //     //
-                    //     const distance = calculateDistance(
-                    //         prevPosition.lat,
-                    //         prevPosition.lng,
-                    //         location.lat,
-                    //         location.lng,
-                    //     )
 
-                    //     if (
-                    //         // deltaTime > MIN_DELTA_TIME &&
-                    //         distance > MIN_MOVEMENT_DISTANCE
-                    //     ) {
-                    //         // deltaTime과 이동 거리가 모두 임계값보다 큰 경우에만 속도 계산
-                    //         const speed = distance / deltaTime
-                    //         setCurrentSpeed(speed * 3.6) // m/s to km/h
-                    //     } else {
-                    //         // 작은 deltaTime 또는 작은 이동 거리의 경우 속도를 0 또는 이전 속도로 설정
-                    //         setCurrentSpeed(0) // 또는 이전 속도로 설정
-                    //     }
-                    // }
-
-                    // setPrevPosition({
-                    //     ...location,
-                    //     timestamp: position.timestamp,
-                    // })
+                    setPrevPosition({
+                        ...location,
+                        timestamp: position.timestamp,
+                    })
                 },
                 (error) => {
                     if (error.code === error.PERMISSION_DENIED) {
@@ -289,7 +285,7 @@ export default function GoogleMapsWrapper({
                                         fontSize: '10px',
                                     }}
                                     icon={{
-                                        path: google.maps.SymbolPath.CIRCLE,
+                                        path: google?.maps.SymbolPath.CIRCLE,
                                         scale: 15, // 마커의 크기
                                         fillColor: data.isMe
                                             ? '#fff'
