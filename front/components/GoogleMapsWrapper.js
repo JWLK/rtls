@@ -189,38 +189,39 @@ export default function GoogleMapsWrapper({
                     const location = { lat: latitude, lng: longitude }
 
                     socket.emit('share-location', location)
+                    setCurrentSpeed(speed * 3.6) // m/s to km/h
                     // console.log(position)
                     // 속도 계산
-                    if (prevPosition) {
-                        const deltaTime =
-                            (position.timestamp -
-                                (prevPosition.timestamp || 0)) /
-                            1000
-                        //
-                        const distance = calculateDistance(
-                            prevPosition.lat,
-                            prevPosition.lng,
-                            location.lat,
-                            location.lng,
-                        )
+                    // if (prevPosition) {
+                    //     const deltaTime =
+                    //         (position.timestamp -
+                    //             (prevPosition.timestamp || 0)) /
+                    //         1000
+                    //     //
+                    //     const distance = calculateDistance(
+                    //         prevPosition.lat,
+                    //         prevPosition.lng,
+                    //         location.lat,
+                    //         location.lng,
+                    //     )
 
-                        if (
-                            // deltaTime > MIN_DELTA_TIME &&
-                            distance > MIN_MOVEMENT_DISTANCE
-                        ) {
-                            // deltaTime과 이동 거리가 모두 임계값보다 큰 경우에만 속도 계산
-                            // const speed = distance / deltaTime
-                            setCurrentSpeed(speed * 3.6) // m/s to km/h
-                        } else {
-                            // 작은 deltaTime 또는 작은 이동 거리의 경우 속도를 0 또는 이전 속도로 설정
-                            setCurrentSpeed(0) // 또는 이전 속도로 설정
-                        }
-                    }
+                    //     if (
+                    //         // deltaTime > MIN_DELTA_TIME &&
+                    //         distance > MIN_MOVEMENT_DISTANCE
+                    //     ) {
+                    //         // deltaTime과 이동 거리가 모두 임계값보다 큰 경우에만 속도 계산
+                    //         const speed = distance / deltaTime
+                    //         setCurrentSpeed(speed * 3.6) // m/s to km/h
+                    //     } else {
+                    //         // 작은 deltaTime 또는 작은 이동 거리의 경우 속도를 0 또는 이전 속도로 설정
+                    //         setCurrentSpeed(0) // 또는 이전 속도로 설정
+                    //     }
+                    // }
 
-                    setPrevPosition({
-                        ...location,
-                        timestamp: position.timestamp,
-                    })
+                    // setPrevPosition({
+                    //     ...location,
+                    //     timestamp: position.timestamp,
+                    // })
                 },
                 (error) => {
                     if (error.code === error.PERMISSION_DENIED) {
