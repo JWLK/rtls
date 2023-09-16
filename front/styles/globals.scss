@@ -166,7 +166,8 @@ a {
 
 .navInfo {
     position: absolute;
-    bottom: 'calc(10vh - env(safe-area-inset-bottom))';
+    // bottom: 'calc(10vh - env(safe-area-inset-bottom))';
+    bottom: 10vh;
     left: 50%;
     transform: translateX(-50%);
     display: flex;

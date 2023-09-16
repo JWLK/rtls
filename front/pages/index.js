@@ -98,7 +98,7 @@ export default function Home() {
                     style={{
                         display: 'flex',
                         position: 'absolute',
-                        bottom: 'calc(500vh - env(safe-area-inset-bottom))',
+                        top: '50vh',
                         right: 3,
                         zIndex: 10,
                         padding: '10px',
