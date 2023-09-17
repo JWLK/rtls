@@ -25,6 +25,8 @@ body {
     font-family: 'Inter', 'IBM Plex Sans', '나눔스퀘어', 'NanumSquare',
         sans-serif;
     background: #373737;
+    overflow: hidden;
+    touch-action: none;
 }
 .reg {
     font-weight: 400;
