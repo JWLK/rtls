@@ -14,13 +14,13 @@ import { Camera } from 'react-feather'
 import { IoIosChatbubbles } from 'react-icons/io'
 import { TbLocation, TbLocationFilled, TbLocationPin } from 'react-icons/tb'
 
-// import { GoogleMapsWrapper, socket } from '../components/GoogleMapsWrapper'
-const GoogleMapsWrapper = dynamic(
-    () => import('../components/GoogleMapsWrapper'),
-    {
-        ssr: false,
-    },
-)
+import GoogleMapsWrapper from '../components/GoogleMapsWrapper'
+// const GoogleMapsWrapper = dynamic(
+//     () => import('../components/GoogleMapsWrapper'),
+//     {
+//         ssr: false,
+//     },
+// )
 
 //Import Component
 import DashBoard_Popup from '../components/DashBoard_Popup'
