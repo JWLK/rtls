@@ -41,8 +41,7 @@ export default function GoogleMapsWrapper({
     children,
     isSharingEnabled,
     isCentered,
-    isZoomReset,
-    setIsZoomReset,
+    setIsCentered,
 }) {
     const [permissionStatus, setPermissionStatus] = useState(null) // 위치 권한 상태 저장
     const [socket, setSocket] = useState(null)
@@ -227,6 +226,9 @@ export default function GoogleMapsWrapper({
                 }}
                 mapContainerStyle={containerStyle}
                 center={mapCenter}
+                onDrag={() => {
+                    setIsCentered(false)
+                }}
                 zoom={mapZoom}
                 onZoomChanged={() => {
                     // Google 지도의 줌 레벨이 변경될 때 mapZoom 상태를 업데이트합니다.

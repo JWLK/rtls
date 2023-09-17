@@ -163,6 +163,7 @@ export default function Home() {
                     <GoogleMapsWrapper
                         isSharingEnabled={isSharingEnabled}
                         isCentered={isCentered}
+                        setIsCentered={setIsCentered}
                     />
                 </div>
 
