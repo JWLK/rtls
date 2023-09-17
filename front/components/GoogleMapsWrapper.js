@@ -26,6 +26,16 @@ const focusZoom = 18
 
 //Get Component
 import MarkerProfile from './Marker/MarkerProfile'
+const svgCode = `<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="30" stroke="white" stroke-width="5" fill="rgba(0,0,0,0.5)" />
+        <!-- 이미지를 원 모양으로 자릅니다. -->
+        <clipPath id="circle-clip">
+            <circle cx="30" cy="30" r="40" />
+        </clipPath>
+
+        <!-- 이미지를 원 안에 배치하고 clip-path를 적용합니다. -->
+        <image x="30" y="30" width="30" height="30" xlink:href="https://roadaround.club/IMG_1709.png/" alt="My Happy SVG" clip-path="url(#circle-clip)" />
+    </svg>`
 
 export default function GoogleMapsWrapper({
     children,
@@ -250,19 +260,25 @@ export default function GoogleMapsWrapper({
                                         lng: data.lng,
                                     }}
                                     label={{
-                                        text: data.isMe ? 'Me' : 'other',
+                                        text: data.isMe ? ' ' : ' ',
                                         color: 'white',
                                         fontSize: '10px',
                                     }}
                                     icon={{
-                                        url: getMarkerData,
-                                        scaledSize: new window.google.maps.Size(
-                                            50,
-                                            50,
-                                        ),
+                                        path: google.maps.SymbolPath.CIRCLE,
+                                        scale: 15, // 마커의 크기
+                                        fillColor: data.isMe
+                                            ? '#f23920'
+                                            : '#53389E', // 자신은 빨간색, 다른 사용자는 파란색
+                                        fillOpacity: 1,
+                                        strokeColor: 'white',
+                                        strokeOpacity: 1,
+                                        strokeWeight: 5,
+                                        // url: 'path_to_your_image.png',
+                                        // scaledSize: new google.maps.Size(40, 40), // 아이콘 이미지 크기를 40x40
                                     }}
                                     // animation={google.maps.Animation.BOUNCE}
-                                ></Marker>
+                                />
 
                                 {/* <OverlayView
                                     position={{ lat: data.lat, lng: data.lng }}

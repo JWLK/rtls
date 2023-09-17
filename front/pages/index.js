@@ -54,6 +54,17 @@ export default function Home() {
         toggleCentering()
     }, [])
 
+    const svgCode = `<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="40" stroke="white" stroke-width="5" fill="rgba(0,0,0,0.5)" />
+        <!-- 이미지를 원 모양으로 자릅니다. -->
+        <clipPath id="circle-clip">
+            <circle cx="50" cy="50" r="40" />
+        </clipPath>
+
+        <!-- 이미지를 원 안에 배치하고 clip-path를 적용합니다. -->
+        <image x="10" y="10" width="80" height="80" xlink:href="https://roadaround.club/IMG_1709.png/" alt="My Happy SVG" clip-path="url(#circle-clip)" />
+    </svg>`
+
     return (
         <>
             <div
@@ -109,6 +120,19 @@ export default function Home() {
                         hideLabel
                     />
                 </div>
+
+                <div
+                    style={{
+                        display: 'flex',
+                        position: 'absolute',
+                        top: 25,
+                        right: 10,
+                        zIndex: 10,
+                        padding: '10px',
+                        visibility: 'visible',
+                    }}
+                    dangerouslySetInnerHTML={{ __html: svgCode }}
+                />
 
                 {/* <div
                     style={{
