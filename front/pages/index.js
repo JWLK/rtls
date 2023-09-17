@@ -22,9 +22,13 @@ const GoogleMapsWrapper = dynamic(
     },
 )
 
+//Import Component
+import DashBoard_Popup from '../components/DashBoard_Popup'
+
 export default function Home() {
     const [isSharingEnabled, setSharingEnabled] = useState(true)
     const [isCentered, setIsCentered] = useState(false)
+    const [isOpen, setIsOpen] = useState(false)
 
     const handleToggle = useCallback((toggled) => {
         setSharingEnabled(toggled)
@@ -38,6 +42,10 @@ export default function Home() {
     const toggleCentering = useCallback(() => {
         setIsCentered(!isCentered)
     }, [isCentered])
+
+    const toggleIsOpen = useCallback(() => {
+        setIsOpen(!isOpen)
+    }, [isOpen])
 
     return (
         <>
@@ -127,20 +135,27 @@ export default function Home() {
                     />
                 </div>
 
-                <div className="navInfo">
-                    <div className="icon">
+                <div className={`navInfo${isOpen ? 'hide' : ''}`}>
+                    <div className="navIcon" onClick={toggleIsOpen}>
                         <Dashboard sx={{ fontSize: 30 }} />
                     </div>
-                    <div className="icon">
+                    <div className="navIcon">
                         <IoIosChatbubbles size="30" />
                     </div>
-                    <div className="icon" onClick={toggleCentering}>
+                    <div className="navIcon" onClick={toggleCentering}>
                         {isCentered ? (
                             <TbLocationPin size="30" color="#f23920" />
                         ) : (
                             <TbLocation size="30" />
                         )}
                     </div>
+                </div>
+
+                <div className="dashInfo">
+                    <DashBoard_Popup
+                        isOpen={isOpen}
+                        toggleIsOpen={toggleIsOpen}
+                    />
                 </div>
             </div>
         </>
