@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { Button, Toggle } from '@carbon/react'
 import {
@@ -27,7 +27,7 @@ import DashBoard_Popup from '../components/DashBoard_Popup'
 
 export default function Home() {
     const [isSharingEnabled, setSharingEnabled] = useState(true)
-    const [isCentered, setIsCentered] = useState(true)
+    const [isCentered, setIsCentered] = useState(false)
     const [isOpenViewStep, setIsOpenViewStep] = useState(0)
 
     const handleToggle = useCallback((toggled) => {
@@ -49,6 +49,10 @@ export default function Home() {
         },
         [isOpenViewStep],
     )
+
+    useEffect(() => {
+        toggleCentering()
+    }, [])
 
     return (
         <>
