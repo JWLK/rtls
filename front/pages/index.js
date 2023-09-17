@@ -27,8 +27,8 @@ import DashBoard_Popup from '../components/DashBoard_Popup'
 
 export default function Home() {
     const [isSharingEnabled, setSharingEnabled] = useState(true)
-    const [isCentered, setIsCentered] = useState(false)
-    const [isOpen, setIsOpen] = useState(false)
+    const [isCentered, setIsCentered] = useState(true)
+    const [isOpenViewStep, setIsOpenViewStep] = useState(0)
 
     const handleToggle = useCallback((toggled) => {
         setSharingEnabled(toggled)
@@ -43,9 +43,12 @@ export default function Home() {
         setIsCentered(!isCentered)
     }, [isCentered])
 
-    const toggleIsOpen = useCallback(() => {
-        setIsOpen(!isOpen)
-    }, [isOpen])
+    const toggleIsOpen = useCallback(
+        (index) => {
+            setIsOpenViewStep(index)
+        },
+        [isOpenViewStep],
+    )
 
     return (
         <>
@@ -135,8 +138,8 @@ export default function Home() {
                     />
                 </div>
 
-                <div className={`navInfo${isOpen ? 'hide' : ''}`}>
-                    <div className="navIcon" onClick={toggleIsOpen}>
+                <div className={`navInfo ${isOpenViewStep > 0 ? 'hide' : ''}`}>
+                    <div className="navIcon" onClick={() => toggleIsOpen(1)}>
                         <Dashboard sx={{ fontSize: 30 }} />
                     </div>
                     <div className="navIcon">
@@ -153,7 +156,7 @@ export default function Home() {
 
                 <div className="dashInfo">
                     <DashBoard_Popup
-                        isOpen={isOpen}
+                        isOpenViewStep={isOpenViewStep}
                         toggleIsOpen={toggleIsOpen}
                     />
                 </div>

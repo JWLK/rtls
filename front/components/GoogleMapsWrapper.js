@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 
+import io from 'socket.io-client'
 import {
     GoogleMap,
     LoadScript,
@@ -10,28 +11,21 @@ import {
 
 import { MapTheme_DarkGreen } from '../themes/google-map/map-dark-green'
 import { MapTheme_DarkGray } from '../themes/google-map/map-dark-gray'
+const customStyles = MapTheme_DarkGray
 // import { InfoWindow } from '@react-google-maps/api'; // 현재 InfoWindow는 주석 처리 되어 있음
-
-import io from 'socket.io-client'
-
 const containerStyle = {
     width: '100vw',
     height: 'calc(100vh - env(safe-area-inset-bottom))',
 }
-
-const MIN_DELTA_TIME = 1 // 임계값 설정 (초 단위)
-const MIN_MOVEMENT_DISTANCE = 1 // 최소 이동 거리 (미터 단위)
-
 const initialCenter = {
     lat: 37.57972779165909,
     lng: 126.97704086507996,
-
-    //37.57972779165909, 126.97704086507996
 }
 const initialZoom = 15
 const focusZoom = 18
 
-const customStyles = MapTheme_DarkGray
+//Get Component
+import MarkerProfile from './Marker/MarkerProfile'
 
 export default function GoogleMapsWrapper({
     children,
@@ -237,6 +231,7 @@ export default function GoogleMapsWrapper({
                         // console.log(`Data ${index} ::  ${JSON.stringify(data)}`)
                         // const isMe = data.hash === myHash
 
+                        const getMarkerData = MarkerProfile(50, 50)
                         return (
                             <React.Fragment key={`markerData-${index}`}>
                                 <Marker
@@ -251,42 +246,15 @@ export default function GoogleMapsWrapper({
                                         fontSize: '10px',
                                     }}
                                     icon={{
-                                        path: google.maps.SymbolPath.CIRCLE,
-                                        scale: 15, // 마커의 크기
-                                        fillColor: data.isMe
-                                            ? '#fff'
-                                            : '#53389E', // 자신은 빨간색, 다른 사용자는 파란색
-                                        fillOpacity: 1,
-                                        strokeColor: 'white',
-                                        strokeOpacity: 0,
-                                        strokeWeight: 0,
-                                        // url: 'path_to_your_image.png',
-                                        // scaledSize: new google.maps.Size(40, 40), // 아이콘 이미지 크기를 40x40 픽셀로
+                                        url: getMarkerData,
+                                        scaledSize: new window.google.maps.Size(
+                                            50,
+                                            50,
+                                        ),
                                     }}
                                     // animation={google.maps.Animation.BOUNCE}
-                                >
-                                    <OverlayView
-                                        position={{
-                                            lat: data.lat,
-                                            lng: data.lng,
-                                        }}
-                                        mapPaneName={
-                                            OverlayView.OVERLAY_MOUSE_TARGET
-                                        }
-                                    >
-                                        <div
-                                            className={
-                                                data.isMe
-                                                    ? 'pulsingOverlayRed'
-                                                    : 'pulsingOverlayBlue'
-                                            }
-                                        >
-                                            <>
-                                                {/* <div className="centerDot"></div> */}
-                                            </>
-                                        </div>
-                                    </OverlayView>
-                                </Marker>
+                                ></Marker>
+
                                 {/* <OverlayView
                                     position={{ lat: data.lat, lng: data.lng }}
                                     mapPaneName={
