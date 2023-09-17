@@ -36,6 +36,8 @@ export default function GoogleMapsWrapper({
 }) {
     const [permissionStatus, setPermissionStatus] = useState(null) // 위치 권한 상태 저장
     const [socket, setSocket] = useState(null)
+    const [hasFetchedInitialLocation, setHasFetchedInitialLocation] =
+        useState(false)
 
     const [markerData, setMarkerData] = useState([])
     const [mapCenter, setMapCenter] = useState(initialCenter)
@@ -78,6 +80,13 @@ export default function GoogleMapsWrapper({
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         // 권한이 승인됐을 때의 로직
+                        if (!hasFetchedInitialLocation) {
+                            // 한 번만 위치를 설정하고 이후에는 업데이트하지 않도록 확인
+                            const { latitude, longitude } = position.coords
+                            const location = { lat: latitude, lng: longitude }
+                            setMapCenter(location)
+                            setHasFetchedInitialLocation(true)
+                        }
                     },
                     (error) => {
                         if (error.code === error.PERMISSION_DENIED) {
