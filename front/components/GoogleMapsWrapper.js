@@ -1,11 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react'
-
 import io from 'socket.io-client'
 import {
     GoogleMap,
     LoadScript,
     Marker,
+    MarkerF,
     OverlayView,
+    OverlayViewF,
+    InfoWindowF,
 } from '@react-google-maps/api'
 // const google = window.google
 
@@ -21,8 +23,8 @@ const initialCenter = {
     lat: 37.57972779165909,
     lng: 126.97704086507996,
 }
-const initialZoom = 15
-const focusZoom = 18
+const initialZoom = 13
+const focusZoom = 15
 
 //Get Component
 import MarkerProfile from './Marker/MarkerProfile'
@@ -51,6 +53,7 @@ export default function GoogleMapsWrapper({
     const [markerData, setMarkerData] = useState([])
     const [mapCenter, setMapCenter] = useState(initialCenter)
     const [mapZoom, setMapZoom] = useState(initialZoom)
+    const [selectedMarker, setSelectedMarker] = useState(null)
     const hasCenterBeenSetRef = useRef(false)
     const ownHashCode = useRef(null)
     const mapRef = useRef(null) // Google 지도 인스턴스에 대한 참조
@@ -59,7 +62,7 @@ export default function GoogleMapsWrapper({
     const [currentSpeed, setCurrentSpeed] = useState(0) // 현재 속도 저장
 
     const SOCKET_SERVER_URL =
-        process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || 'http://localhost:3000'
+        process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || 'http://localhost:3300'
 
     useEffect(() => {
         // 위치 권한 체크
@@ -255,62 +258,59 @@ export default function GoogleMapsWrapper({
                         const getMarkerData = MarkerProfile(50, 50)
                         return (
                             <React.Fragment key={`markerData-${index}`}>
-                                <Marker
+                                <MarkerF
                                     key={data.hash}
                                     position={{
                                         lat: data.lat,
                                         lng: data.lng,
                                     }}
-                                    label={{
-                                        text: data.isMe ? ' ' : ' ',
-                                        color: 'white',
-                                        fontSize: '10px',
-                                    }}
                                     icon={{
                                         path: google.maps.SymbolPath.CIRCLE,
                                         scale: 15, // 마커의 크기
                                         fillColor: data.isMe
-                                            ? '#f23920'
+                                            ? 'rgba(0,0,0,0)'
                                             : '#53389E', // 자신은 빨간색, 다른 사용자는 파란색
                                         fillOpacity: 1,
                                         strokeColor: 'white',
                                         strokeOpacity: 1,
-                                        strokeWeight: 5,
-                                        // url: 'path_to_your_image.png',
-                                        // scaledSize: new google.maps.Size(40, 40), // 아이콘 이미지 크기를 40x40
+                                        strokeWeight: 2,
                                     }}
-                                    // animation={google.maps.Animation.BOUNCE}
-                                />
-
-                                {/* <OverlayView
-                                    position={{ lat: data.lat, lng: data.lng }}
-                                    mapPaneName={
-                                        OverlayView.OVERLAY_MOUSE_TARGET
-                                    }
+                                    onClick={() => {
+                                        setMapCenter({
+                                            lat: data.lat,
+                                            lng: data.lng,
+                                        })
+                                    }}
                                 >
-                                    <div
-                                        className={
-                                            data.isMe
-                                                ? 'pulsingOverlayRed'
-                                                : 'pulsingOverlayBlue'
-                                        }
-                                    ></div>
-                                </OverlayView> */}
-
+                                    {data.isMe && (
+                                        <OverlayViewF
+                                            position={{
+                                                lat: data.lat,
+                                                lng: data.lng,
+                                            }}
+                                            mapPaneName={
+                                                OverlayView.MARKER_LAYER
+                                            }
+                                        >
+                                            <div className="custom-marker-wrap">
+                                                <div className="custom-marker"></div>
+                                            </div>
+                                        </OverlayViewF>
+                                    )}
+                                </MarkerF>
                                 {data.isMe && (
-                                    <OverlayView
+                                    <OverlayViewF
                                         position={{
                                             lat: data.lat,
                                             lng: data.lng,
                                         }}
-                                        mapPaneName={
-                                            OverlayView.OVERLAY_MOUSE_TARGET
-                                        }
+                                        mapPaneName={OverlayView.MARKER_LAYER}
                                     >
                                         <div className="speedInfo">
-                                            {`${currentSpeed.toFixed(2)} km/h`}
+                                            {`${currentSpeed.toFixed(0)}`}
+                                            <span>{` km/h`}</span>
                                         </div>
-                                    </OverlayView>
+                                    </OverlayViewF>
                                 )}
                             </React.Fragment>
                         )
